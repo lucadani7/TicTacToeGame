@@ -33,7 +33,7 @@ jobs:
 
       - name: Build with Nuitka
         run: |
-          uv run -m nuitka --standalone --onefile --include-data-dir=sounds=sounds --output-dir=build --assume-yes-for-downloads main.py
+          uv run nuitka --standalone --onefile --include-data-dir=sounds=sounds --output-dir=build --assume-yes-for-downloads main.py
 
       - name: Rename Windows Output
         if: matrix.os == 'windows-latest'
