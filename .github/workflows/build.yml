@@ -31,9 +31,6 @@ jobs:
       - name: Install dependencies
         run: uv add pygame nuitka zstandard
 
-      - name: Generate Sounds
-        run: uv run generator_sunete.py
-
       - name: Build with Nuitka
         run: |
           uv run -m nuitka --standalone --onefile --include-data-dir=sounds=sounds --output-dir=build --assume-yes-for-downloads main.py
