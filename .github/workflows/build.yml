@@ -1,0 +1,53 @@
+name: Build TicTacToe (Nuitka)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            bin_name: main.exe
+          - os: macos-latest
+            bin_name: main.bin
+          - os: ubuntu-latest
+            bin_name: main.bin
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv add pygame nuitka zstandard
+
+      - name: Generate Sounds
+        run: uv run generator_sunete.py
+
+      - name: Build with Nuitka
+        run: |
+          uv run -m nuitka --standalone --onefile --include-data-dir=sounds=sounds --output-dir=build --assume-yes-for-downloads main.py
+
+      - name: Rename Windows Output
+        if: matrix.os == 'windows-latest'
+        run: move build/${{ matrix.bin_name }} build/Tic_Tac_Toe_Windows.exe
+
+      - name: Rename Unix Output
+        if: matrix.os != 'windows-latest'
+        run: mv build/${{ matrix.bin_name }} build/Tic_Tac_Toe_${{ matrix.os }}
+
+      - name: Upload Executables
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tic_Tac_Toe_${{ matrix.os }}
+          path: build/Tic_Tac_Toe_*
